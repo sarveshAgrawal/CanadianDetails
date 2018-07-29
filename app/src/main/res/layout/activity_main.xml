@@ -17,7 +17,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="Canada Detals"
             android:textColor="@color/white"
             android:textSize="@dimen/_16sdp"
             android:textStyle="bold" />

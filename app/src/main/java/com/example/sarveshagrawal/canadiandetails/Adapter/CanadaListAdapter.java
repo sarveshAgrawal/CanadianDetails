@@ -1,6 +1,7 @@
 package com.example.sarveshagrawal.canadiandetails.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.example.sarveshagrawal.canadiandetails.Activity.Description;
 import com.example.sarveshagrawal.canadiandetails.Data.Canada_List_Model;
 import com.example.sarveshagrawal.canadiandetails.R;
 
@@ -48,7 +50,7 @@ public class CanadaListAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
 
         View view = inflater.from(context).inflate(R.layout.view_list,null);
 
@@ -66,6 +68,13 @@ public class CanadaListAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 int index = Integer.parseInt(v.getTag().toString());
+
+                Intent intent = new Intent(context, Description.class);
+                intent.putExtra("title",mList.get(index).getTitle());
+                intent.putExtra("description",mList.get(index).getDescription());
+                intent.putExtra("image",mList.get(index).getImageHref());
+                context.startActivity(intent);
+
 
             }
         });

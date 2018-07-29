@@ -36,6 +36,7 @@ import com.android.volley.toolbox.Volley;
 import com.example.sarveshagrawal.canadiandetails.Adapter.CanadaListAdapter;
 import com.example.sarveshagrawal.canadiandetails.Data.Canada_List_Model;
 import com.example.sarveshagrawal.canadiandetails.Data.Constants;
+import com.example.sarveshagrawal.canadiandetails.Data.Prefrences;
 import com.example.sarveshagrawal.canadiandetails.R;
 
 import org.json.JSONArray;
@@ -56,14 +57,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (!checkConnect()) {
+        if (!checkConnect()) { // Checking Internet Connection.
             callAlertDilalog();
         }
     }
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -72,15 +73,23 @@ public class MainActivity extends AppCompatActivity {
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swiperefresh);
         listView = (ListView) findViewById(R.id.listView);
 
+        if (savedInstanceState == null || !savedInstanceState.containsKey("key")) { // Searching List in SaveInstanceState
+            getAPIList(); // Fetching JSON Data.
+        } else {
+            title.setText(Prefrences.getTittle(MainActivity.this));
+            mList = savedInstanceState.getParcelableArrayList("key");
+        }
+
         mSwipeRefreshLayout.setColorSchemeResources(R.color.titleTheme);
-        adapter = new CanadaListAdapter(mList,MainActivity.this);
+
+        adapter = new CanadaListAdapter(mList, MainActivity.this);
         listView.setDivider(null);
         listView.setAdapter(adapter);
-        getAPIList();
 
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                // Refresh list Fatch new Data.
                 getAPIList();
                 mSwipeRefreshLayout.setRefreshing(false);
             }
@@ -100,13 +109,13 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     JSONObject obj = new JSONObject(response);
                     title.setText(obj.optString("title"));
+                    Prefrences.setTittle(obj.optString("title"),MainActivity.this);
                     JSONArray ary = obj.getJSONArray("rows");
                     for (int x = 0; x < ary.length(); x++) {
                         JSONObject object = ary.optJSONObject(x);
-                        Canada_List_Model model = new Canada_List_Model();
-                        model.setTitle(object.optString("title"));
-                        model.setDescription(object.optString("description"));
-                        model.setImageHref(object.optString("imageHref"));
+                        Canada_List_Model model = new Canada_List_Model(object.optString("title"),
+                                object.optString("description"),object.optString("imageHref"));
+
                         mList.add(model);
                     }
                     adapter.notifyDataSetChanged();
@@ -143,6 +152,12 @@ public class MainActivity extends AppCompatActivity {
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         rq.add(sr);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList("key", mList);
+        super.onSaveInstanceState(outState);
     }
 
     private void callAlertDilalog() {
