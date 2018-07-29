@@ -9,11 +9,9 @@ public class Canada_List_Model {
     String description;
     String imageHref;
 
-    public Canada_List_Model(String title, String description, String imageHref) {
-        this.title = title;
-        this.description = description;
-        this.imageHref = imageHref;
+    public Canada_List_Model() {
     }
+
 
     public String getTitle() {
         return title;
